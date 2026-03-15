@@ -78,6 +78,22 @@
       <div id="matchups" class="mt-8 space-y-8"></div>
 
       <div class="mt-8 rounded-[28px] bg-slate-900 p-6 text-white shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-2xl font-bold">Your picks so far</h2>
+            <p class="mt-1 text-sm text-slate-300">Selections are saved in this browser.</p>
+          </div>
+          <button
+            onclick="resetPicks()"
+            class="rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/20"
+          >
+            Reset picks
+          </button>
+        </div>
+        <div id="picksSummary" class="mt-4 grid gap-3 md:grid-cols-2"></div>
+      </div>
+
+      <div class="mt-8 rounded-[28px] bg-slate-900 p-6 text-white shadow-sm">
         <h2 class="text-2xl font-bold">How the real version will work</h2>
         <div class="mt-4 grid gap-3 md:grid-cols-4">
           <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
@@ -103,6 +119,7 @@
     <script>
       const matchups = [
         {
+          id: "r64-1",
           round: "Round of 64",
           teamA: {
             name: "UConn",
@@ -112,7 +129,8 @@
             stats: ["Elite defense", "Strong rebounding", "Experienced coach"],
             whyWin: "More complete team with tournament experience.",
             heartFact: "Fans love them because they feel like a big-stage team every March.",
-            funFact: "Won multiple national titles in the modern era."
+            funFact: "Won multiple national titles in the modern era.",
+            heartScore: 7
           },
           teamB: {
             name: "Drake",
@@ -122,10 +140,12 @@
             stats: ["Underdog energy", "Can score in bursts", "Dangerous if hot early"],
             whyWin: "Has upset potential if the threes are falling.",
             heartFact: "Easy Cinderella pick if you love a story.",
-            funFact: "A classic bracket-popper type team."
+            funFact: "A classic bracket-popper type team.",
+            heartScore: 9
           }
         },
         {
+          id: "r64-2",
           round: "Round of 64",
           teamA: {
             name: "Duke",
@@ -135,7 +155,8 @@
             stats: ["Big-name program", "Strong talent", "Can control tempo"],
             whyWin: "Usually brings talent and tournament confidence.",
             heartFact: "One of the most recognizable names in college basketball.",
-            funFact: "A team many casual fans know instantly."
+            funFact: "A team many casual fans know instantly.",
+            heartScore: 6
           },
           teamB: {
             name: "Vermont",
@@ -145,10 +166,49 @@
             stats: ["Disciplined play", "Upset potential", "Team-first style"],
             whyWin: "Could hang around and make this uncomfortable late.",
             heartFact: "Feels like a classic Cinderella-style pick.",
-            funFact: "Smaller schools often become fan favorites in March."
+            funFact: "Smaller schools often become fan favorites in March.",
+            heartScore: 8
           }
         }
       ];
+
+      function getStoredPicks() {
+        try {
+          return JSON.parse(localStorage.getItem("bracketBffPicks") || "{}");
+        } catch {
+          return {};
+        }
+      }
+
+      function savePicks(picks) {
+        localStorage.setItem("bracketBffPicks", JSON.stringify(picks));
+      }
+
+      function selectPick(matchupId, teamName, mode) {
+        const picks = getStoredPicks();
+        picks[matchupId] = { teamName, mode };
+        savePicks(picks);
+        renderMatchups();
+        renderSummary();
+      }
+
+      function resetPicks() {
+        localStorage.removeItem("bracketBffPicks");
+        renderMatchups();
+        renderSummary();
+      }
+
+      function chooseSafe(matchup) {
+        return matchup.teamA.seed < matchup.teamB.seed ? matchup.teamA : matchup.teamB;
+      }
+
+      function chooseHeart(matchup) {
+        return matchup.teamA.heartScore >= matchup.teamB.heartScore ? matchup.teamA : matchup.teamB;
+      }
+
+      function chooseChaos(matchup) {
+        return matchup.teamA.seed > matchup.teamB.seed ? matchup.teamA : matchup.teamB;
+      }
 
       function seedBadge(seed) {
         let bg = "bg-slate-100 text-slate-800";
@@ -173,9 +233,24 @@
         `).join("");
       }
 
-      function teamCard(team, label) {
+      function selectedStyles(isSelected) {
+        return isSelected
+          ? "ring-2 ring-pink-400 shadow-md bg-pink-50"
+          : "ring-1 ring-slate-200 bg-white";
+      }
+
+      function selectedLabel(isSelected, mode) {
+        if (!isSelected) return "";
         return `
-          <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <div class="mt-4 rounded-2xl bg-pink-100 px-4 py-3 text-sm font-semibold text-pink-800">
+            Your pick${mode ? ` · ${mode}` : ""} ✅
+          </div>
+        `;
+      }
+
+      function teamCard(team, label, isSelected, mode) {
+        return `
+          <div class="rounded-3xl p-5 shadow-sm ${selectedStyles(isSelected)}">
             <div class="flex items-start justify-between gap-3">
               <div>
                 <p class="text-sm font-medium text-pink-600">${label}</p>
@@ -184,6 +259,8 @@
               </div>
               ${seedBadge(team.seed)}
             </div>
+
+            ${selectedLabel(isSelected, mode)}
 
             <div class="mt-4 rounded-2xl bg-slate-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Star player</p>
@@ -215,25 +292,105 @@
         `;
       }
 
-      function matchupBlock(matchup) {
+      function matchupButtons(matchup) {
         return `
-          <div class="grid gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-start">
-            ${teamCard(matchup.teamA, "Safer side?")}
+          <div class="mt-4 grid gap-3 sm:grid-cols-3">
+            <button
+              onclick="selectPick('${matchup.id}', '${chooseSafe(matchup).name}', 'Safe Pick')"
+              class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+            >
+              <div class="text-sm font-semibold">Safe Pick</div>
+              <div class="mt-1 text-xs text-slate-300">Choose ${chooseSafe(matchup).name}</div>
+            </button>
 
-            <div class="flex flex-col items-center justify-center gap-3 py-2 lg:pt-16">
-              <div class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">${matchup.round}</div>
-              <div class="text-sm font-medium text-slate-500">matchup</div>
-              <div class="rounded-full bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-700">
-                ${matchup.teamA.name} vs ${matchup.teamB.name}
-              </div>
-            </div>
+            <button
+              onclick="selectPick('${matchup.id}', '${chooseHeart(matchup).name}', 'Heart Pick')"
+              class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+            >
+              <div class="text-sm font-semibold">Heart Pick</div>
+              <div class="mt-1 text-xs text-slate-300">Choose ${chooseHeart(matchup).name}</div>
+            </button>
 
-            ${teamCard(matchup.teamB, "Spicier side?")}
+            <button
+              onclick="selectPick('${matchup.id}', '${chooseChaos(matchup).name}', 'Chaos Pick')"
+              class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+            >
+              <div class="text-sm font-semibold">Chaos Pick</div>
+              <div class="mt-1 text-xs text-slate-300">Choose ${chooseChaos(matchup).name}</div>
+            </button>
           </div>
         `;
       }
 
-      document.getElementById("matchups").innerHTML = matchups.map(matchupBlock).join("");
+      function matchupBlock(matchup) {
+        const picks = getStoredPicks();
+        const selected = picks[matchup.id];
+        const selectedTeam = selected?.teamName || "";
+        const selectedMode = selected?.mode || "";
+
+        return `
+          <div class="rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <div class="grid gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-start">
+              ${teamCard(
+                matchup.teamA,
+                "Safer side?",
+                selectedTeam === matchup.teamA.name,
+                selectedTeam === matchup.teamA.name ? selectedMode : ""
+              )}
+
+              <div class="flex flex-col items-center justify-center gap-3 py-2 lg:pt-16">
+                <div class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">${matchup.round}</div>
+                <div class="text-sm font-medium text-slate-500">matchup</div>
+                <div class="rounded-full bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-700">
+                  ${matchup.teamA.name} vs ${matchup.teamB.name}
+                </div>
+              </div>
+
+              ${teamCard(
+                matchup.teamB,
+                "Spicier side?",
+                selectedTeam === matchup.teamB.name,
+                selectedTeam === matchup.teamB.name ? selectedMode : ""
+              )}
+            </div>
+
+            ${matchupButtons(matchup)}
+          </div>
+        `;
+      }
+
+      function renderMatchups() {
+        document.getElementById("matchups").innerHTML = matchups.map(matchupBlock).join("");
+      }
+
+      function renderSummary() {
+        const picks = getStoredPicks();
+        const pickedGames = matchups.filter(m => picks[m.id]);
+
+        if (pickedGames.length === 0) {
+          document.getElementById("picksSummary").innerHTML = `
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+              <p class="font-semibold">No picks yet</p>
+              <p class="mt-1 text-sm text-slate-300">Use the buttons under each matchup to start building your bracket.</p>
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById("picksSummary").innerHTML = pickedGames.map(matchup => {
+          const pick = picks[matchup.id];
+          return `
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+              <p class="font-semibold">${matchup.teamA.name} vs ${matchup.teamB.name}</p>
+              <p class="mt-1 text-sm text-slate-200">Picked: ${pick.teamName}</p>
+              <p class="mt-1 text-xs text-slate-300">${pick.mode}</p>
+            </div>
+          `;
+        }).join("");
+      }
+
+      renderMatchups();
+      renderSummary();
     </script>
   </body>
 </html>
