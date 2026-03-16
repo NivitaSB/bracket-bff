@@ -1,0 +1,38 @@
+[
+  {
+    "id": "r64-1",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "UConn",
+      "seed": 1,
+      "record": "",
+      "star": "",
+      "heartScore": 7
+    },
+    "teamB": {
+      "name": "Stetson",
+      "seed": 16,
+      "record": "",
+      "star": "",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-2",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Florida Atlantic",
+      "seed": 8,
+      "record": "",
+      "star": "",
+      "heartScore": 7
+    },
+    "teamB": {
+      "name": "Northwestern",
+      "seed": 9,
+      "record": "",
+      "star": "",
+      "heartScore": 6
+    }
+  }
+]
