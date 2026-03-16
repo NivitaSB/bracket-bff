@@ -38,23 +38,23 @@
             <p class="mt-1 text-sm text-slate-600">Perfect for people who do not want to overthink stats.</p>
           </div>
           <p class="text-sm text-slate-500">
-Use these buttons under each matchup for your recommended pick.
-</p>
+            Use these buttons under each matchup to choose your pick.
+          </p>
         </div>
 
         <div class="mt-5 grid gap-3 sm:grid-cols-3">
-          <button class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
+          <div class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
             <div class="text-sm font-semibold">Safe Pick</div>
             <div class="mt-1 text-xs text-slate-300">Usually the stronger seed and steadier résumé.</div>
-          </button>
-          <button class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
+          </div>
+          <div class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
             <div class="text-sm font-semibold">Heart Pick</div>
             <div class="mt-1 text-xs text-slate-300">Choose the story, mascot, school vibe, or fan favorite.</div>
-          </button>
-          <button class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
+          </div>
+          <div class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
             <div class="text-sm font-semibold">Chaos Pick</div>
             <div class="mt-1 text-xs text-slate-300">Choose upset energy and let the bracket get weird.</div>
-          </button>
+          </div>
         </div>
 
         <div class="mt-6 grid gap-3 md:grid-cols-4">
@@ -119,60 +119,14 @@ Use these buttons under each matchup for your recommended pick.
     </div>
 
     <script>
-      const matchups = [
-        {
-          id: "r64-1",
-          round: "Round of 64",
-          teamA: {
-            name: "UConn",
-            seed: 1,
-            record: "31-3",
-            star: "Donovan Clingan",
-            stats: ["Elite defense", "Strong rebounding", "Experienced coach"],
-            whyWin: "More complete team with tournament experience.",
-            heartFact: "Fans love them because they feel like a big-stage team every March.",
-            funFact: "Won multiple national titles in the modern era.",
-            heartScore: 7
-          },
-          teamB: {
-            name: "Drake",
-            seed: 12,
-            record: "27-6",
-            star: "Tucker DeVries",
-            stats: ["Underdog energy", "Can score in bursts", "Dangerous if hot early"],
-            whyWin: "Has upset potential if the threes are falling.",
-            heartFact: "Easy Cinderella pick if you love a story.",
-            funFact: "A classic bracket-popper type team.",
-            heartScore: 9
-          }
-        },
-        {
-          id: "r64-2",
-          round: "Round of 64",
-          teamA: {
-            name: "Duke",
-            seed: 4,
-            record: "26-8",
-            star: "Kyle Filipowski",
-            stats: ["Big-name program", "Strong talent", "Can control tempo"],
-            whyWin: "Usually brings talent and tournament confidence.",
-            heartFact: "One of the most recognizable names in college basketball.",
-            funFact: "A team many casual fans know instantly.",
-            heartScore: 6
-          },
-          teamB: {
-            name: "Vermont",
-            seed: 13,
-            record: "28-6",
-            star: "TJ Hurley",
-            stats: ["Disciplined play", "Upset potential", "Team-first style"],
-            whyWin: "Could hang around and make this uncomfortable late.",
-            heartFact: "Feels like a classic Cinderella-style pick.",
-            funFact: "Smaller schools often become fan favorites in March.",
-            heartScore: 8
-          }
-        }
-      ];
+      let matchups = [];
+
+      async function loadMatchups() {
+        const response = await fetch("matchups.json");
+        matchups = await response.json();
+        renderMatchups();
+        renderSummary();
+      }
 
       function getStoredPicks() {
         try {
@@ -391,8 +345,7 @@ Use these buttons under each matchup for your recommended pick.
         }).join("");
       }
 
-      renderMatchups();
-      renderSummary();
+      loadMatchups();
     </script>
   </body>
 </html>
