@@ -219,8 +219,8 @@
         });
 
         const finalFour = [
-          deriveMatchup("final4-1", "Final Four", "National Semifinal", elite8ByRegion["East"][0], elite8ByRegion["West"][0]),
-          deriveMatchup("final4-2", "Final Four", "National Semifinal", elite8ByRegion["South"][0], elite8ByRegion["Midwest"][0])
+          deriveMatchup("final4-1", "Final Four", "National Semifinal", elite8ByRegion["East"][0], elite8ByRegion["South"][0]),
+          deriveMatchup("final4-2", "Final Four", "National Semifinal", elite8ByRegion["West"][0], elite8ByRegion["Midwest"][0])
         ];
 
         const championship = [
@@ -266,6 +266,13 @@
       function selectPick(matchupId, teamName, mode) {
         const picks = getStoredPicks();
         picks[matchupId] = { teamName, mode };
+        savePicks(picks);
+        renderAll();
+      }
+
+      function manualPick(matchupId, teamName) {
+        const picks = getStoredPicks();
+        picks[matchupId] = { teamName, mode: "Manual Pick" };
         savePicks(picks);
         renderAll();
       }
@@ -329,14 +336,23 @@
         let safe = 0;
         let heart = 0;
         let chaos = 0;
+        let manual = 0;
 
         Object.values(picks).forEach((pick) => {
           if (pick.mode === "Safe Pick") safe++;
           if (pick.mode === "Heart Pick") heart++;
           if (pick.mode === "Chaos Pick") chaos++;
+          if (pick.mode === "Manual Pick") manual++;
         });
 
-        if (safe === 0 && heart === 0 && chaos === 0) return null;
+        if (safe === 0 && heart === 0 && chaos === 0 && manual === 0) return null;
+
+        if (manual >= safe && manual >= heart && manual >= chaos) {
+          return {
+            title: "Bracket Boss 👑",
+            blurb: "You trust your own instincts and make the calls yourself."
+          };
+        }
 
         if (chaos >= safe && chaos >= heart) {
           return {
@@ -474,9 +490,13 @@ ${window.location.href}`;
         `;
       }
 
-      function teamCard(team, label, isSelected, mode) {
+      function teamCard(team, label, isSelected, mode, matchupId) {
+        const clickable = !team.placeholder;
         return `
-          <div class="rounded-3xl p-5 shadow-sm ${selectedStyles(isSelected, team.placeholder)}">
+          <button
+            ${clickable ? `onclick="manualPick('${matchupId}', '${team.name.replace(/'/g, "\\'")}')"` : "disabled"}
+            class="w-full rounded-3xl p-5 text-left shadow-sm transition ${selectedStyles(isSelected, team.placeholder)} ${clickable ? "hover:translate-y-[-1px] cursor-pointer" : "cursor-not-allowed"}"
+          >
             <div class="flex items-start justify-between gap-3">
               <div>
                 <p class="text-sm font-medium text-pink-600">${label}</p>
@@ -514,7 +534,7 @@ ${window.location.href}`;
                 <p class="mt-1 text-sm text-slate-800">${team.funFact || "TBD"}</p>
               </div>
             </div>
-          </div>
+          </button>
         `;
       }
 
@@ -525,7 +545,7 @@ ${window.location.href}`;
         return `
           <div class="mt-4 grid gap-3 sm:grid-cols-3">
             <button
-              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseSafe(matchup).name}', 'Safe Pick')"`}
+              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseSafe(matchup).name.replace(/'/g, "\\'")}', 'Safe Pick')"`}
               class="rounded-2xl px-4 py-4 text-left text-white shadow-sm transition ${
                 locked ? "cursor-not-allowed bg-slate-400" : "bg-slate-900 hover:translate-y-[-1px]"
               }"
@@ -535,7 +555,7 @@ ${window.location.href}`;
             </button>
 
             <button
-              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseHeart(matchup).name}', 'Heart Pick')"`}
+              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseHeart(matchup).name.replace(/'/g, "\\'")}', 'Heart Pick')"`}
               class="rounded-2xl px-4 py-4 text-left text-white shadow-sm transition ${
                 locked ? "cursor-not-allowed bg-slate-400" : "bg-slate-900 hover:translate-y-[-1px]"
               }"
@@ -545,7 +565,7 @@ ${window.location.href}`;
             </button>
 
             <button
-              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseChaos(matchup).name}', 'Chaos Pick')"`}
+              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseChaos(matchup).name.replace(/'/g, "\\'")}', 'Chaos Pick')"`}
               class="rounded-2xl px-4 py-4 text-left text-white shadow-sm transition ${
                 locked ? "cursor-not-allowed bg-slate-400" : "bg-slate-900 hover:translate-y-[-1px]"
               }"
@@ -570,7 +590,8 @@ ${window.location.href}`;
                 matchup.teamA,
                 "Safer side?",
                 selectedTeam === matchup.teamA.name,
-                selectedTeam === matchup.teamA.name ? selectedMode : ""
+                selectedTeam === matchup.teamA.name ? selectedMode : "",
+                matchup.id
               )}
 
               <div class="flex flex-col items-center justify-center gap-3 py-2 lg:pt-16">
@@ -579,13 +600,15 @@ ${window.location.href}`;
                 <div class="rounded-full bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-700">
                   ${matchup.teamA.name} vs ${matchup.teamB.name}
                 </div>
+                <div class="text-xs text-slate-500">Tip: tap a team card to make a manual pick.</div>
               </div>
 
               ${teamCard(
                 matchup.teamB,
                 "Spicier side?",
                 selectedTeam === matchup.teamB.name,
-                selectedTeam === matchup.teamB.name ? selectedMode : ""
+                selectedTeam === matchup.teamB.name ? selectedMode : "",
+                matchup.id
               )}
             </div>
 
