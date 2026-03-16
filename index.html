@@ -86,7 +86,7 @@
         </div>
       </div>
 
-      <div id="matchups" class="mt-8 space-y-10"></div>
+      <div id="bracketRounds" class="mt-8 space-y-12"></div>
 
       <div class="mt-8 rounded-[28px] bg-slate-900 p-6 text-white shadow-sm">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -125,13 +125,17 @@
     </div>
 
     <script>
-      let matchups = [];
+      let firstRoundMatchups = [];
       const regionOrder = ["East", "West", "South", "Midwest"];
 
       async function loadMatchups() {
         const response = await fetch("matchups.json");
-        matchups = await response.json();
-        renderMatchups();
+        firstRoundMatchups = await response.json();
+        renderAll();
+      }
+
+      function renderAll() {
+        renderBracket();
         renderSummary();
       }
 
@@ -147,48 +151,177 @@
         localStorage.setItem("bracketBffPicks", JSON.stringify(picks));
       }
 
-      function selectPick(matchupId, teamName, mode) {
-        const picks = getStoredPicks();
-        picks[matchupId] = { teamName, mode };
-        savePicks(picks);
-        renderMatchups();
-        renderSummary();
+      function createPlaceholder(name) {
+        return {
+          name,
+          seed: "",
+          record: "",
+          star: "",
+          stats: ["Complete the prior round to unlock this matchup."],
+          whyWin: "Make the earlier pick(s) first.",
+          heartFact: "This spot will fill in automatically after the previous round.",
+          funFact: "Bracket BFF builds the next round from your earlier winners.",
+          heartScore: 0,
+          placeholder: true
+        };
       }
 
-      function applyModeToAll(mode) {
+      function getSelectedTeamFromMatchup(matchup, picks) {
+        const selected = picks[matchup.id];
+        if (!selected) return null;
+        if (selected.teamName === matchup.teamA.name) return matchup.teamA;
+        if (selected.teamName === matchup.teamB.name) return matchup.teamB;
+        return null;
+      }
+
+      function deriveMatchup(id, round, region, sourceA, sourceB) {
         const picks = getStoredPicks();
+        const winnerA =
+          getSelectedTeamFromMatchup(sourceA, picks) ||
+          createPlaceholder(`Winner of ${sourceA.teamA.name} vs ${sourceA.teamB.name}`);
+        const winnerB =
+          getSelectedTeamFromMatchup(sourceB, picks) ||
+          createPlaceholder(`Winner of ${sourceB.teamA.name} vs ${sourceB.teamB.name}`);
 
-        matchups.forEach((matchup) => {
-          let team;
+        return {
+          id,
+          region,
+          round,
+          teamA: winnerA,
+          teamB: winnerB
+        };
+      }
 
-          if (mode === "Safe Pick") team = chooseSafe(matchup);
-          if (mode === "Heart Pick") team = chooseHeart(matchup);
-          if (mode === "Chaos Pick") team = chooseChaos(matchup);
+      function buildBracket() {
+        const firstByRegion = {};
+        const round32ByRegion = {};
+        const sweet16ByRegion = {};
+        const elite8ByRegion = {};
 
-          picks[matchup.id] = { teamName: team.name, mode: mode };
+        regionOrder.forEach((region) => {
+          firstByRegion[region] = firstRoundMatchups.filter((m) => m.region === region);
+
+          round32ByRegion[region] = [
+            deriveMatchup(`${region.toLowerCase()}-r32-1`, "Round of 32", region, firstByRegion[region][0], firstByRegion[region][1]),
+            deriveMatchup(`${region.toLowerCase()}-r32-2`, "Round of 32", region, firstByRegion[region][2], firstByRegion[region][3]),
+            deriveMatchup(`${region.toLowerCase()}-r32-3`, "Round of 32", region, firstByRegion[region][4], firstByRegion[region][5]),
+            deriveMatchup(`${region.toLowerCase()}-r32-4`, "Round of 32", region, firstByRegion[region][6], firstByRegion[region][7])
+          ];
+
+          sweet16ByRegion[region] = [
+            deriveMatchup(`${region.toLowerCase()}-s16-1`, "Sweet 16", region, round32ByRegion[region][0], round32ByRegion[region][1]),
+            deriveMatchup(`${region.toLowerCase()}-s16-2`, "Sweet 16", region, round32ByRegion[region][2], round32ByRegion[region][3])
+          ];
+
+          elite8ByRegion[region] = [
+            deriveMatchup(`${region.toLowerCase()}-e8-1`, "Elite 8", region, sweet16ByRegion[region][0], sweet16ByRegion[region][1])
+          ];
         });
 
-        savePicks(picks);
-        renderMatchups();
-        renderSummary();
+        const finalFour = [
+          deriveMatchup("final4-1", "Final Four", "National Semifinal", elite8ByRegion["East"][0], elite8ByRegion["West"][0]),
+          deriveMatchup("final4-2", "Final Four", "National Semifinal", elite8ByRegion["South"][0], elite8ByRegion["Midwest"][0])
+        ];
+
+        const championship = [
+          deriveMatchup("championship", "Championship", "National Championship", finalFour[0], finalFour[1])
+        ];
+
+        return {
+          firstByRegion,
+          round32ByRegion,
+          sweet16ByRegion,
+          elite8ByRegion,
+          finalFour,
+          championship
+        };
       }
 
-      function resetPicks() {
-        localStorage.removeItem("bracketBffPicks");
-        renderMatchups();
-        renderSummary();
+      function isLocked(matchup) {
+        return !!(matchup.teamA.placeholder || matchup.teamB.placeholder);
       }
 
       function chooseSafe(matchup) {
+        if (isLocked(matchup)) return null;
         return matchup.teamA.seed < matchup.teamB.seed ? matchup.teamA : matchup.teamB;
       }
 
       function chooseHeart(matchup) {
+        if (isLocked(matchup)) return null;
         return matchup.teamA.heartScore >= matchup.teamB.heartScore ? matchup.teamA : matchup.teamB;
       }
 
       function chooseChaos(matchup) {
+        if (isLocked(matchup)) return null;
         return matchup.teamA.seed > matchup.teamB.seed ? matchup.teamA : matchup.teamB;
+      }
+
+      function pickTeamByMode(matchup, mode) {
+        if (mode === "Safe Pick") return chooseSafe(matchup);
+        if (mode === "Heart Pick") return chooseHeart(matchup);
+        if (mode === "Chaos Pick") return chooseChaos(matchup);
+        return null;
+      }
+
+      function selectPick(matchupId, teamName, mode) {
+        const picks = getStoredPicks();
+        picks[matchupId] = { teamName, mode };
+        savePicks(picks);
+        renderAll();
+      }
+
+      function applyModeToAll(mode) {
+        const picks = {};
+
+        firstRoundMatchups.forEach((matchup) => {
+          const chosen = pickTeamByMode(matchup, mode);
+          if (chosen) picks[matchup.id] = { teamName: chosen.name, mode };
+        });
+
+        savePicks(picks);
+
+        let bracket = buildBracket();
+
+        Object.values(bracket.round32ByRegion).flat().forEach((matchup) => {
+          const chosen = pickTeamByMode(matchup, mode);
+          if (chosen) picks[matchup.id] = { teamName: chosen.name, mode };
+        });
+        savePicks(picks);
+
+        bracket = buildBracket();
+        Object.values(bracket.sweet16ByRegion).flat().forEach((matchup) => {
+          const chosen = pickTeamByMode(matchup, mode);
+          if (chosen) picks[matchup.id] = { teamName: chosen.name, mode };
+        });
+        savePicks(picks);
+
+        bracket = buildBracket();
+        Object.values(bracket.elite8ByRegion).flat().forEach((matchup) => {
+          const chosen = pickTeamByMode(matchup, mode);
+          if (chosen) picks[matchup.id] = { teamName: chosen.name, mode };
+        });
+        savePicks(picks);
+
+        bracket = buildBracket();
+        bracket.finalFour.forEach((matchup) => {
+          const chosen = pickTeamByMode(matchup, mode);
+          if (chosen) picks[matchup.id] = { teamName: chosen.name, mode };
+        });
+        savePicks(picks);
+
+        bracket = buildBracket();
+        bracket.championship.forEach((matchup) => {
+          const chosen = pickTeamByMode(matchup, mode);
+          if (chosen) picks[matchup.id] = { teamName: chosen.name, mode };
+        });
+
+        savePicks(picks);
+        renderAll();
+      }
+
+      function resetPicks() {
+        localStorage.removeItem("bracketBffPicks");
+        renderAll();
       }
 
       function calculatePersonality() {
@@ -268,15 +401,23 @@ ${window.location.href}`;
           return;
         }
 
+        const bracket = buildBracket();
         let summary = "My Bracket BFF picks so far:\n\n";
 
-        regionOrder.forEach((region) => {
-          const regionGames = matchups.filter((m) => m.region === region);
-          const pickedRegionGames = regionGames.filter((m) => picks[m.id]);
+        const sections = [
+          ["Round of 64", firstRoundMatchups],
+          ["Round of 32", Object.values(bracket.round32ByRegion).flat()],
+          ["Sweet 16", Object.values(bracket.sweet16ByRegion).flat()],
+          ["Elite 8", Object.values(bracket.elite8ByRegion).flat()],
+          ["Final Four", bracket.finalFour],
+          ["Championship", bracket.championship]
+        ];
 
-          if (pickedRegionGames.length > 0) {
-            summary += `${region} Region\n`;
-            pickedRegionGames.forEach((matchup) => {
+        sections.forEach(([label, games]) => {
+          const pickedGames = games.filter((m) => picks[m.id]);
+          if (pickedGames.length > 0) {
+            summary += `${label}\n`;
+            pickedGames.forEach((matchup) => {
               summary += `${matchup.teamA.name} vs ${matchup.teamB.name} → ${picks[matchup.id].teamName}\n`;
             });
             summary += `\n`;
@@ -284,17 +425,18 @@ ${window.location.href}`;
         });
 
         const personality = calculatePersonality();
-
         if (personality) {
           summary += `Bracket Personality:\n${personality.title}\n\n`;
         }
 
-        summary += `Try it here:\n${window.location.href}`;
-
-        shareText(summary);
+        shareText(summary + `Try it here:\n${window.location.href}`);
       }
 
       function seedBadge(seed) {
+        if (seed === "" || seed == null) {
+          return `<span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">TBD</span>`;
+        }
+
         let bg = "bg-slate-100 text-slate-800";
         let note = "mid seed";
 
@@ -317,10 +459,10 @@ ${window.location.href}`;
         `).join("");
       }
 
-      function selectedStyles(isSelected) {
-        return isSelected
-          ? "ring-2 ring-pink-400 shadow-md bg-pink-50"
-          : "ring-1 ring-slate-200 bg-white";
+      function selectedStyles(isSelected, placeholder) {
+        if (isSelected) return "ring-2 ring-pink-400 shadow-md bg-pink-50";
+        if (placeholder) return "ring-1 ring-dashed ring-slate-300 bg-slate-50";
+        return "ring-1 ring-slate-200 bg-white";
       }
 
       function selectedLabel(isSelected, mode) {
@@ -334,7 +476,7 @@ ${window.location.href}`;
 
       function teamCard(team, label, isSelected, mode) {
         return `
-          <div class="rounded-3xl p-5 shadow-sm ${selectedStyles(isSelected)}">
+          <div class="rounded-3xl p-5 shadow-sm ${selectedStyles(isSelected, team.placeholder)}">
             <div class="flex items-start justify-between gap-3">
               <div>
                 <p class="text-sm font-medium text-pink-600">${label}</p>
@@ -377,30 +519,39 @@ ${window.location.href}`;
       }
 
       function matchupButtons(matchup) {
+        const locked = isLocked(matchup);
+        const lockedText = "Complete prior round first";
+
         return `
           <div class="mt-4 grid gap-3 sm:grid-cols-3">
             <button
-              onclick="selectPick('${matchup.id}', '${chooseSafe(matchup).name}', 'Safe Pick')"
-              class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseSafe(matchup).name}', 'Safe Pick')"`}
+              class="rounded-2xl px-4 py-4 text-left text-white shadow-sm transition ${
+                locked ? "cursor-not-allowed bg-slate-400" : "bg-slate-900 hover:translate-y-[-1px]"
+              }"
             >
               <div class="text-sm font-semibold">Safe Pick</div>
-              <div class="mt-1 text-xs text-slate-300">Choose ${chooseSafe(matchup).name}</div>
+              <div class="mt-1 text-xs text-slate-200">${locked ? lockedText : `Choose ${chooseSafe(matchup).name}`}</div>
             </button>
 
             <button
-              onclick="selectPick('${matchup.id}', '${chooseHeart(matchup).name}', 'Heart Pick')"
-              class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseHeart(matchup).name}', 'Heart Pick')"`}
+              class="rounded-2xl px-4 py-4 text-left text-white shadow-sm transition ${
+                locked ? "cursor-not-allowed bg-slate-400" : "bg-slate-900 hover:translate-y-[-1px]"
+              }"
             >
               <div class="text-sm font-semibold">Heart Pick</div>
-              <div class="mt-1 text-xs text-slate-300">Choose ${chooseHeart(matchup).name}</div>
+              <div class="mt-1 text-xs text-slate-200">${locked ? lockedText : `Choose ${chooseHeart(matchup).name}`}</div>
             </button>
 
             <button
-              onclick="selectPick('${matchup.id}', '${chooseChaos(matchup).name}', 'Chaos Pick')"
-              class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+              ${locked ? "disabled" : `onclick="selectPick('${matchup.id}', '${chooseChaos(matchup).name}', 'Chaos Pick')"`}
+              class="rounded-2xl px-4 py-4 text-left text-white shadow-sm transition ${
+                locked ? "cursor-not-allowed bg-slate-400" : "bg-slate-900 hover:translate-y-[-1px]"
+              }"
             >
               <div class="text-sm font-semibold">Chaos Pick</div>
-              <div class="mt-1 text-xs text-slate-300">Choose ${chooseChaos(matchup).name}</div>
+              <div class="mt-1 text-xs text-slate-200">${locked ? lockedText : `Choose ${chooseChaos(matchup).name}`}</div>
             </button>
           </div>
         `;
@@ -424,7 +575,7 @@ ${window.location.href}`;
 
               <div class="flex flex-col items-center justify-center gap-3 py-2 lg:pt-16">
                 <div class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">${matchup.round}</div>
-                <div class="text-sm font-medium text-slate-500">${matchup.region} Region</div>
+                <div class="text-sm font-medium text-slate-500">${matchup.region}</div>
                 <div class="rounded-full bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-700">
                   ${matchup.teamA.name} vs ${matchup.teamB.name}
                 </div>
@@ -443,31 +594,82 @@ ${window.location.href}`;
         `;
       }
 
-      function renderMatchups() {
-        const grouped = regionOrder.map((region) => {
-          const regionGames = matchups.filter((m) => m.region === region);
+      function renderSection(title, groups) {
+        return `
+          <section class="space-y-5">
+            <div class="flex items-center gap-3">
+              <h2 class="text-3xl font-black tracking-tight text-slate-900">${title}</h2>
+            </div>
+            <div class="space-y-8">
+              ${groups.map(group => `
+                <div class="space-y-4">
+                  <div class="flex items-center gap-3">
+                    <h3 class="text-xl font-bold text-slate-800">${group.title}</h3>
+                  </div>
+                  <div class="space-y-6">
+                    ${group.games.map(matchupBlock).join("")}
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }
 
-          return `
-            <section class="space-y-4">
-              <div class="flex items-center gap-3">
-                <h2 class="text-3xl font-black tracking-tight text-slate-900">${region} Region</h2>
-                <span class="rounded-full bg-pink-100 px-3 py-1 text-xs font-semibold text-pink-700">
-                  Round of 64
-                </span>
-              </div>
-              <div class="space-y-6">
-                ${regionGames.map(matchupBlock).join("")}
-              </div>
-            </section>
-          `;
-        }).join("");
+      function renderBracket() {
+        const bracket = buildBracket();
 
-        document.getElementById("matchups").innerHTML = grouped;
+        const round64Groups = regionOrder.map(region => ({
+          title: `${region} Region`,
+          games: bracket.firstByRegion[region]
+        }));
+
+        const round32Groups = regionOrder.map(region => ({
+          title: `${region} Region`,
+          games: bracket.round32ByRegion[region]
+        }));
+
+        const sweet16Groups = regionOrder.map(region => ({
+          title: `${region} Region`,
+          games: bracket.sweet16ByRegion[region]
+        }));
+
+        const elite8Groups = regionOrder.map(region => ({
+          title: `${region} Regional Final`,
+          games: bracket.elite8ByRegion[region]
+        }));
+
+        const final4Groups = [{
+          title: "National Semifinals",
+          games: bracket.finalFour
+        }];
+
+        const championshipGroups = [{
+          title: "National Championship",
+          games: bracket.championship
+        }];
+
+        document.getElementById("bracketRounds").innerHTML = [
+          renderSection("Round of 64", round64Groups),
+          renderSection("Round of 32", round32Groups),
+          renderSection("Sweet 16", sweet16Groups),
+          renderSection("Elite 8", elite8Groups),
+          renderSection("Final Four", final4Groups),
+          renderSection("Championship", championshipGroups)
+        ].join("");
       }
 
       function renderSummary() {
         const picks = getStoredPicks();
-        const pickedGames = matchups.filter((m) => picks[m.id]);
+        const bracket = buildBracket();
+        const sections = [
+          ["Round of 64", firstRoundMatchups],
+          ["Round of 32", Object.values(bracket.round32ByRegion).flat()],
+          ["Sweet 16", Object.values(bracket.sweet16ByRegion).flat()],
+          ["Elite 8", Object.values(bracket.elite8ByRegion).flat()],
+          ["Final Four", bracket.finalFour],
+          ["Championship", bracket.championship]
+        ];
         const personality = calculatePersonality();
 
         document.getElementById("personalityBox").innerHTML = personality
@@ -480,40 +682,32 @@ ${window.location.href}`;
           `
           : "";
 
-        if (pickedGames.length === 0) {
-          document.getElementById("picksSummary").innerHTML = `
-            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-              <p class="font-semibold">No picks yet</p>
-              <p class="mt-1 text-sm text-slate-300">Use the buttons under each matchup to start building your bracket.</p>
-            </div>
-          `;
-          return;
-        }
-
-        const groupedSummary = regionOrder.map((region) => {
-          const regionGames = pickedGames.filter((m) => m.region === region);
-          if (regionGames.length === 0) return "";
+        const pickedHtml = sections.map(([title, games]) => {
+          const pickedGames = games.filter((m) => picks[m.id]);
+          if (pickedGames.length === 0) return "";
 
           return `
             <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-              <p class="font-semibold text-pink-200">${region} Region</p>
+              <p class="font-semibold text-pink-200">${title}</p>
               <div class="mt-3 space-y-3">
-                ${regionGames.map((matchup) => {
-                  const pick = picks[matchup.id];
-                  return `
-                    <div>
-                      <p class="font-semibold">${matchup.teamA.name} vs ${matchup.teamB.name}</p>
-                      <p class="mt-1 text-sm text-slate-200">Picked: ${pick.teamName}</p>
-                      <p class="mt-1 text-xs text-slate-300">${pick.mode}</p>
-                    </div>
-                  `;
-                }).join("")}
+                ${pickedGames.map((matchup) => `
+                  <div>
+                    <p class="font-semibold">${matchup.teamA.name} vs ${matchup.teamB.name}</p>
+                    <p class="mt-1 text-sm text-slate-200">Picked: ${picks[matchup.id].teamName}</p>
+                    <p class="mt-1 text-xs text-slate-300">${picks[matchup.id].mode}</p>
+                  </div>
+                `).join("")}
               </div>
             </div>
           `;
         }).join("");
 
-        document.getElementById("picksSummary").innerHTML = groupedSummary;
+        document.getElementById("picksSummary").innerHTML = pickedHtml || `
+          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+            <p class="font-semibold">No picks yet</p>
+            <p class="mt-1 text-sm text-slate-300">Use the buttons under each matchup to start building your bracket.</p>
+          </div>
+        `;
       }
 
       loadMatchups();
