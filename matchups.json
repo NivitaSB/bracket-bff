@@ -3,36 +3,832 @@
     "id": "r64-1",
     "round": "Round of 64",
     "teamA": {
-      "name": "UConn",
-      "seed": 1,
+      "name": "Ohio State",
+      "seed": 8,
       "record": "",
       "star": "",
-      "heartScore": 7
+      "stats": ["Big Ten test", "Balanced roster", "Tough draw"],
+      "whyWin": "Can win if it controls tempo and rebounds well.",
+      "heartFact": "A recognizable program that casual fans know.",
+      "funFact": "This is a classic 8-vs-9 toss-up game.",
+      "heartScore": 6
     },
     "teamB": {
-      "name": "Stetson",
-      "seed": 16,
+      "name": "TCU",
+      "seed": 9,
       "record": "",
       "star": "",
-      "heartScore": 8
+      "stats": ["Physical play", "Underdog edge", "Close-game potential"],
+      "whyWin": "Can make this ugly and steal a close one.",
+      "heartFact": "Feels like the kind of team people pick for grit.",
+      "funFact": "8-vs-9 games are usually among the hardest to call.",
+      "heartScore": 7
     }
   },
   {
     "id": "r64-2",
     "round": "Round of 64",
     "teamA": {
-      "name": "Florida Atlantic",
+      "name": "Nebraska",
+      "seed": 4,
+      "record": "",
+      "star": "",
+      "stats": ["Strong seed", "Power conference team", "Solid profile"],
+      "whyWin": "Higher seed with a safer résumé.",
+      "heartFact": "A fun pick if you want a strong team but not a 1 seed.",
+      "funFact": "4 seeds are often popular Sweet 16 picks.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Troy",
+      "seed": 13,
+      "record": "",
+      "star": "",
+      "stats": ["Upset path", "Underdog energy", "Loose pressure"],
+      "whyWin": "Could pull an upset if Nebraska starts slow.",
+      "heartFact": "13 seeds always tempt bracket chaos lovers.",
+      "funFact": "This is exactly the kind of seed line that produces surprises.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-3",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Louisville",
+      "seed": 6,
+      "record": "",
+      "star": "",
+      "stats": ["Athletic", "Tournament brand", "Middle-seed value"],
+      "whyWin": "Can advance if it plays to its seed.",
+      "heartFact": "A name-brand program that many casual fans recognize.",
+      "funFact": "6-vs-11 games are danger zones for favorites.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "South Florida",
+      "seed": 11,
+      "record": "",
+      "star": "",
+      "stats": ["Upset alert", "Loose underdog", "Dangerous seed line"],
+      "whyWin": "11 seeds are classic upset picks for a reason.",
+      "heartFact": "Underdog fans love this type of draw.",
+      "funFact": "11 seeds often become bracket darlings.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-4",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Wisconsin",
+      "seed": 5,
+      "record": "",
+      "star": "",
+      "stats": ["Experienced feel", "Tournament-worthy seed", "Steady profile"],
+      "whyWin": "Safer pick if you want the stronger seed.",
+      "heartFact": "Feels dependable for casual bracket makers.",
+      "funFact": "5-vs-12 is the iconic upset matchup every year.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "High Point",
+      "seed": 12,
+      "record": "",
+      "star": "",
+      "stats": ["Cinderella energy", "Bracket-buster seed", "Nothing to lose"],
+      "whyWin": "This is exactly the kind of seed people pick for chaos.",
+      "heartFact": "A 12 seed always gets love in office pools.",
+      "funFact": "12-over-5 upsets are March Madness folklore.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-5",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Duke",
+      "seed": 1,
+      "record": "",
+      "star": "",
+      "stats": ["Top seed", "Blue-blood program", "High expectations"],
+      "whyWin": "One of the strongest teams in the field.",
+      "heartFact": "Even non-sports people usually know Duke.",
+      "funFact": "1 seeds are the strongest teams in each region.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Siena",
+      "seed": 16,
+      "record": "",
+      "star": "",
+      "stats": ["Massive underdog", "Nothing to lose", "Historic long-shot"],
+      "whyWin": "Would need a true March miracle.",
+      "heartFact": "Everyone loves to imagine a 16-over-1 shocker.",
+      "funFact": "Only a tiny handful of 16 seeds have ever beaten a 1 seed.",
+      "heartScore": 10
+    }
+  },
+  {
+    "id": "r64-6",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Vanderbilt",
+      "seed": 5,
+      "record": "",
+      "star": "",
+      "stats": ["SEC battle-tested", "Strong seed", "Solid bracket profile"],
+      "whyWin": "More stable pick on paper.",
+      "heartFact": "A nice middle-ground choice for cautious players.",
+      "funFact": "5 seeds always get nervous looks because of the 12 seed curse.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "McNeese",
+      "seed": 12,
+      "record": "",
+      "star": "",
+      "stats": ["Classic upset seed", "Loose and fearless", "March vibe"],
+      "whyWin": "If you want a trendy upset, this is one.",
+      "heartFact": "Feels like a ready-made Cinderella pick.",
+      "funFact": "12 seeds are among the most popular upset picks every year.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-7",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Michigan State",
+      "seed": 3,
+      "record": "",
+      "star": "",
+      "stats": ["Strong seed", "High ceiling", "March pedigree"],
+      "whyWin": "Very solid higher-seed choice.",
+      "heartFact": "A program with a long March reputation.",
+      "funFact": "3 seeds are usually expected to survive the first round.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "North Dakota State",
+      "seed": 14,
+      "record": "",
+      "star": "",
+      "stats": ["Underdog story", "Nothing to lose", "Big upset dream"],
+      "whyWin": "Would need to catch fire and stay there.",
+      "heartFact": "A lovable small-school upset pick.",
+      "funFact": "14-over-3 is uncommon but never impossible.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-8",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Arkansas",
+      "seed": 4,
+      "record": "",
+      "star": "",
+      "stats": ["Strong seed", "Athletic upside", "Safer bracket choice"],
+      "whyWin": "Higher seed with more expected talent.",
+      "heartFact": "A recognizable pick for casual fans.",
+      "funFact": "4 seeds are strong, but 13 seeds can get sneaky.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Hawai'i",
+      "seed": 13,
+      "record": "",
+      "star": "",
+      "stats": ["Underdog charm", "Travel story", "Upset path"],
+      "whyWin": "Could become a fan-favorite bracket spoiler.",
+      "heartFact": "A very easy team for casual fans to root for.",
+      "funFact": "Hawai'i immediately stands out in a bracket.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-9",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "North Carolina",
+      "seed": 6,
+      "record": "",
+      "star": "",
+      "stats": ["Big-brand name", "Tournament gravity", "Middle-seed value"],
+      "whyWin": "The name alone will pull a lot of picks.",
+      "heartFact": "A classic program many casual fans trust.",
+      "funFact": "Brand-name teams often get picked over seed logic.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "VCU",
+      "seed": 11,
+      "record": "",
+      "star": "",
+      "stats": ["Upset potential", "Disruptive style", "Danger seed"],
+      "whyWin": "An 11 seed that feels dangerous immediately.",
+      "heartFact": "This is a very tempting bracket upset pick.",
+      "funFact": "11-over-6 is one of the most common first-round surprises.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-10",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Michigan",
+      "seed": 1,
+      "record": "",
+      "star": "",
+      "stats": ["Top seed", "Elite bracket position", "Safer chalk pick"],
+      "whyWin": "One of the strongest teams in the field.",
+      "heartFact": "A 1 seed that feels easy for many people to trust.",
+      "funFact": "This slot is waiting on a First Four winner.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "TBD",
+      "seed": 16,
+      "record": "",
+      "star": "",
+      "stats": ["First Four winner", "Play-in momentum", "Huge underdog"],
+      "whyWin": "Would need a historic upset.",
+      "heartFact": "Play-in winners sometimes become fun story teams.",
+      "funFact": "This team will come from Prairie View A&M vs. Lehigh.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-11",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "BYU",
+      "seed": 6,
+      "record": "",
+      "star": "",
+      "stats": ["Middle-seed strength", "Good value zone", "Advancement chance"],
+      "whyWin": "More stable than the play-in winner on paper.",
+      "heartFact": "A comfortable bracket pick if you want moderate risk.",
+      "funFact": "This slot is waiting on a First Four winner.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "TBD",
+      "seed": 11,
+      "record": "",
+      "star": "",
+      "stats": ["Play-in momentum", "Upset seed line", "Dangerous underdog"],
+      "whyWin": "11 seeds are scary enough, and a play-in team can come in hot.",
+      "heartFact": "Play-in winners often attract chaos pickers.",
+      "funFact": "This team will come from Texas vs. NC State.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-12",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Saint Mary's",
+      "seed": 7,
+      "record": "",
+      "star": "",
+      "stats": ["Solid seed", "Disciplined feel", "Steady bracket pick"],
+      "whyWin": "A decent slightly-safer pick in a tight matchup.",
+      "heartFact": "A team that often gets respect from bracket regulars.",
+      "funFact": "7-vs-10 games are often true coin flips.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Texas A&M",
+      "seed": 10,
+      "record": "",
+      "star": "",
+      "stats": ["Upset-ready seed", "Physical game", "Live underdog"],
+      "whyWin": "Very capable of flipping this matchup.",
+      "heartFact": "A 10 seed can feel like a smart upset without being too wild.",
+      "funFact": "10 seeds beat 7s often enough to make this fun.",
+      "heartScore": 7
+    }
+  },
+  {
+    "id": "r64-13",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Illinois",
+      "seed": 3,
+      "record": "",
+      "star": "",
+      "stats": ["High seed", "Strong profile", "Expected favorite"],
+      "whyWin": "More trustworthy on paper.",
+      "heartFact": "A familiar program that many people feel comfortable picking.",
+      "funFact": "3 seeds are usually popular first-round picks.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Penn",
+      "seed": 14,
+      "record": "",
+      "star": "",
+      "stats": ["Ivy intrigue", "Underdog charm", "Upset lottery ticket"],
+      "whyWin": "Would need a near-perfect game and Illinois to wobble.",
+      "heartFact": "The Ivy League angle is always fun in a bracket.",
+      "funFact": "Some people love picking the smart-school upset.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-14",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Georgia",
       "seed": 8,
       "record": "",
       "star": "",
-      "heartScore": 7
+      "stats": ["Power-conference toughness", "Even seed line", "Tight game feel"],
+      "whyWin": "Could out-muscle a close matchup.",
+      "heartFact": "SEC fans may gravitate here immediately.",
+      "funFact": "Another classic 8-vs-9 toss-up.",
+      "heartScore": 6
     },
     "teamB": {
-      "name": "Northwestern",
+      "name": "Saint Louis",
       "seed": 9,
       "record": "",
       "star": "",
+      "stats": ["Live dog", "Balanced chance", "Close-game path"],
+      "whyWin": "Very realistic upset without it really being an upset.",
+      "heartFact": "A nice pick for people who don’t want full chaos.",
+      "funFact": "9 seeds are barely underdogs against 8s.",
+      "heartScore": 7
+    }
+  },
+  {
+    "id": "r64-15",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Gonzaga",
+      "seed": 3,
+      "record": "",
+      "star": "",
+      "stats": ["March brand", "Strong seed", "High trust factor"],
+      "whyWin": "A very comfortable pick for many brackets.",
+      "heartFact": "Gonzaga has become a March staple for casual fans too.",
+      "funFact": "Programs with repeated tournament success get extra trust.",
       "heartScore": 6
+    },
+    "teamB": {
+      "name": "Kennesaw State",
+      "seed": 14,
+      "record": "",
+      "star": "",
+      "stats": ["Underdog freedom", "Nothing to lose", "Huge upset dream"],
+      "whyWin": "Would need a breakout game and some March magic.",
+      "heartFact": "A smaller school people may adopt instantly.",
+      "funFact": "14 seeds always attract at least a few daring brackets.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-16",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Houston",
+      "seed": 2,
+      "record": "",
+      "star": "",
+      "stats": ["Elite seed", "Strong favorite", "Deep run candidate"],
+      "whyWin": "One of the safer picks on the entire board.",
+      "heartFact": "A trustworthy high seed if you like chalk.",
+      "funFact": "2 seeds almost always survive the first round.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Idaho",
+      "seed": 15,
+      "record": "",
+      "star": "",
+      "stats": ["Long-shot underdog", "Free swing", "Massive upset chance only"],
+      "whyWin": "Would need one of the biggest surprises of the round.",
+      "heartFact": "15 seeds get instant sympathy and curiosity.",
+      "funFact": "Every few years a 15 seed shocks everyone.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-17",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Kentucky",
+      "seed": 7,
+      "record": "",
+      "star": "",
+      "stats": ["Big brand", "High ceiling", "Volatile trust"],
+      "whyWin": "The talent and name recognition will draw plenty of picks.",
+      "heartFact": "One of the most recognizable names in college hoops.",
+      "funFact": "Brand-name programs often get picked heavily.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Santa Clara",
+      "seed": 10,
+      "record": "",
+      "star": "",
+      "stats": ["Upset-ready", "Dangerous seed", "Sneaky pick"],
+      "whyWin": "Feels like the kind of 10 seed that ruins brackets.",
+      "heartFact": "A strong upset choice if you want a little boldness.",
+      "funFact": "7-vs-10 is one of the best seed lines for “smart upset” picks.",
+      "heartScore": 7
+    }
+  },
+  {
+    "id": "r64-18",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Texas Tech",
+      "seed": 5,
+      "record": "",
+      "star": "",
+      "stats": ["Strong seed", "Reliable choice", "Solid résumé"],
+      "whyWin": "The safer pick unless you want to chase a 12-over-5.",
+      "heartFact": "A good choice for bracket players who hate early chaos.",
+      "funFact": "But yes, it’s still a 5-vs-12.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Akron",
+      "seed": 12,
+      "record": "",
+      "star": "",
+      "stats": ["Upset seed", "Cinderella potential", "Bracket-buster vibe"],
+      "whyWin": "A classic upset swing if you want one.",
+      "heartFact": "12 seeds are irresistible to chaos lovers.",
+      "funFact": "This is the most famous upset seed combo in the bracket.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-19",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Arizona",
+      "seed": 1,
+      "record": "",
+      "star": "",
+      "stats": ["Top seed", "Heavy favorite", "Strong chalk pick"],
+      "whyWin": "One of the strongest opening-round choices.",
+      "heartFact": "A top seed that feels easy to trust.",
+      "funFact": "1 seeds are built to survive this round.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Long Island University",
+      "seed": 16,
+      "record": "",
+      "star": "",
+      "stats": ["Extreme underdog", "Miracle needed", "Nothing to lose"],
+      "whyWin": "Would need one of the biggest upsets ever.",
+      "heartFact": "16 seeds are pure hope picks.",
+      "funFact": "A 16-over-1 is still one of the rarest bracket outcomes.",
+      "heartScore": 10
+    }
+  },
+  {
+    "id": "r64-20",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Virginia",
+      "seed": 3,
+      "record": "",
+      "star": "",
+      "stats": ["High seed", "Structured play", "Strong first-round spot"],
+      "whyWin": "A stable high-seed pick.",
+      "heartFact": "Many people like 3 seeds for safer early rounds.",
+      "funFact": "3-over-14 is common, but not guaranteed.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Wright State",
+      "seed": 14,
+      "record": "",
+      "star": "",
+      "stats": ["Underdog puncher's chance", "Free-roll mentality", "Long-shot dream"],
+      "whyWin": "Would need a hot shooting night and a little chaos.",
+      "heartFact": "Easy team to root for if you want an upset story.",
+      "funFact": "14 seeds always tempt at least a few brave brackets.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-21",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Iowa State",
+      "seed": 2,
+      "record": "",
+      "star": "",
+      "stats": ["Very strong seed", "Deep-run profile", "High trust"],
+      "whyWin": "One of the safer favorites in the round.",
+      "heartFact": "A comfortable chalk pick if you want fewer surprises.",
+      "funFact": "2 seeds are expected to move on.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Tennessee State",
+      "seed": 15,
+      "record": "",
+      "star": "",
+      "stats": ["Huge underdog", "Danger only if chaos erupts", "Nothing to lose"],
+      "whyWin": "Would need a major upset script.",
+      "heartFact": "A 15 seed is always an emotional underdog choice.",
+      "funFact": "15 seeds occasionally create first-round headlines.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-22",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Alabama",
+      "seed": 4,
+      "record": "",
+      "star": "",
+      "stats": ["Strong seed", "Safer line", "Good first-round position"],
+      "whyWin": "Plenty of brackets will trust the 4 seed here.",
+      "heartFact": "A strong middle-chalk choice.",
+      "funFact": "4 seeds are safer than 5s but still not bulletproof.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Hofstra",
+      "seed": 13,
+      "record": "",
+      "star": "",
+      "stats": ["Underdog potential", "Loose style", "Upset hope"],
+      "whyWin": "Could turn this into a very annoying game for the favorite.",
+      "heartFact": "13 seeds make fun bracket personality picks.",
+      "funFact": "13-over-4 is a real upset lane every year.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-23",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Villanova",
+      "seed": 8,
+      "record": "",
+      "star": "",
+      "stats": ["Tournament pedigree", "Brand trust", "Tight seed line"],
+      "whyWin": "A lot of people will lean on the program name here.",
+      "heartFact": "Villanova is very familiar even to casual fans.",
+      "funFact": "8-vs-9 is nearly a toss-up no matter the brand.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Utah State",
+      "seed": 9,
+      "record": "",
+      "star": "",
+      "stats": ["Live dog", "Strong upset path", "Little pressure"],
+      "whyWin": "A very reasonable pick in an almost-even matchup.",
+      "heartFact": "A nice choice if you want a slight upset without huge risk.",
+      "funFact": "This is one of the most bracket-splitting games.",
+      "heartScore": 7
+    }
+  },
+  {
+    "id": "r64-24",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Tennessee",
+      "seed": 6,
+      "record": "",
+      "star": "",
+      "stats": ["Middle-seed strength", "Safer pick", "Good bracket floor"],
+      "whyWin": "On paper, still stronger than the play-in winner.",
+      "heartFact": "A comfortable choice if you want some stability.",
+      "funFact": "This slot is waiting on a First Four winner.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "TBD",
+      "seed": 11,
+      "record": "",
+      "star": "",
+      "stats": ["Play-in momentum", "Classic upset seed", "Dangerous draw"],
+      "whyWin": "11 seeds can absolutely pop in the first round.",
+      "heartFact": "Play-in teams are easy to root for.",
+      "funFact": "This team will come from Miami (Ohio) vs. SMU.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-25",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Clemson",
+      "seed": 8,
+      "record": "",
+      "star": "",
+      "stats": ["Even matchup", "Power conference team", "Solid draw"],
+      "whyWin": "Could edge it with experience and physicality.",
+      "heartFact": "An easy pick if you want familiarity.",
+      "funFact": "8-vs-9 is basically bracket coin-flip territory.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Iowa",
+      "seed": 9,
+      "record": "",
+      "star": "",
+      "stats": ["Close-game chance", "Live underdog", "Very winnable matchup"],
+      "whyWin": "A smart slightly-upset pick in a nearly even game.",
+      "heartFact": "A lot of people like 9 seeds as sneaky value picks.",
+      "funFact": "This is the kind of game where many brackets split 50/50.",
+      "heartScore": 7
+    }
+  },
+  {
+    "id": "r64-26",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "St. John's",
+      "seed": 5,
+      "record": "",
+      "star": "",
+      "stats": ["Strong seed", "High-profile program", "Solid route"],
+      "whyWin": "The safer line unless you want to chase the 12.",
+      "heartFact": "A familiar name can make this feel comfortable.",
+      "funFact": "But yes, every 5 seed hears the 12-seed footsteps.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "UNI",
+      "seed": 12,
+      "record": "",
+      "star": "",
+      "stats": ["Cinderella potential", "Upset profile", "Dangerous seed"],
+      "whyWin": "A classic “I know this could happen” upset pick.",
+      "heartFact": "12 seeds are where bracket personalities really show.",
+      "funFact": "This is one of the most tempting upset lines on the board.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-27",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "UCLA",
+      "seed": 7,
+      "record": "",
+      "star": "",
+      "stats": ["Historic brand", "Solid seed", "Tournament trust"],
+      "whyWin": "A lot of users will pick the bigger name here.",
+      "heartFact": "UCLA has automatic March recognition.",
+      "funFact": "Brand power matters a lot in casual brackets.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "UCF",
+      "seed": 10,
+      "record": "",
+      "star": "",
+      "stats": ["Live upset candidate", "Good seed line", "Underdog juice"],
+      "whyWin": "A perfectly reasonable upset if you want one.",
+      "heartFact": "A 10 seed can feel like fun without feeling reckless.",
+      "funFact": "7-vs-10 is a very common upset lane.",
+      "heartScore": 7
+    }
+  },
+  {
+    "id": "r64-28",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Purdue",
+      "seed": 2,
+      "record": "",
+      "star": "",
+      "stats": ["Elite seed", "Strong favorite", "Deep-run possibility"],
+      "whyWin": "A very safe bracket pick.",
+      "heartFact": "2 seeds are comfort food for bracket makers.",
+      "funFact": "This is one of the chalkier games on the board.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Queens",
+      "seed": 15,
+      "record": "",
+      "star": "",
+      "stats": ["Huge underdog", "Zero pressure", "Dream scenario only"],
+      "whyWin": "Would need a true bracket shocker.",
+      "heartFact": "15 seeds are fun if you want to swing big emotionally.",
+      "funFact": "15-over-2 has happened enough to scare people a little.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-29",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Florida",
+      "seed": 1,
+      "record": "",
+      "star": "",
+      "stats": ["Top seed", "Heavy favorite", "Strong chalk anchor"],
+      "whyWin": "Very safe opening-round pick.",
+      "heartFact": "Another 1 seed many users will auto-advance.",
+      "funFact": "This slot is waiting on a First Four winner.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "TBD",
+      "seed": 16,
+      "record": "",
+      "star": "",
+      "stats": ["Play-in momentum", "Huge underdog", "Long-shot dream"],
+      "whyWin": "Would need a historic upset.",
+      "heartFact": "Play-in teams can become instant bracket mascots.",
+      "funFact": "This team will come from UMBC vs. Howard.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-30",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Kansas",
+      "seed": 4,
+      "record": "",
+      "star": "",
+      "stats": ["Blue-blood brand", "Strong seed", "Reliable profile"],
+      "whyWin": "A comfortable first-round favorite.",
+      "heartFact": "Kansas carries instant bracket trust.",
+      "funFact": "Brand-name 4 seeds often get picked heavily.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Cal Baptist",
+      "seed": 13,
+      "record": "",
+      "star": "",
+      "stats": ["Underdog hope", "Spoiler chance", "Loose pressure"],
+      "whyWin": "Could make life stressful if Kansas is cold.",
+      "heartFact": "A fun upset pick if you want one later in the slate.",
+      "funFact": "13 seeds are not supposed to win — which is why people pick them.",
+      "heartScore": 8
+    }
+  },
+  {
+    "id": "r64-31",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "UConn",
+      "seed": 2,
+      "record": "",
+      "star": "",
+      "stats": ["Elite seed", "Big-game trust", "Strong title-path vibe"],
+      "whyWin": "A very safe first-round choice.",
+      "heartFact": "A familiar champion-type name for casual fans.",
+      "funFact": "2 seeds are among the safest picks in the round.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Furman",
+      "seed": 15,
+      "record": "",
+      "star": "",
+      "stats": ["Huge underdog", "Upset dream", "Nothing to lose"],
+      "whyWin": "Would need a big-time bracket surprise.",
+      "heartFact": "A 15 seed always gets at least some sentimental love.",
+      "funFact": "15-over-2 is rare, but it happens enough to stay in people’s minds.",
+      "heartScore": 9
+    }
+  },
+  {
+    "id": "r64-32",
+    "round": "Round of 64",
+    "teamA": {
+      "name": "Miami (Fla.)",
+      "seed": 7,
+      "record": "",
+      "star": "",
+      "stats": ["Solid seed", "Balanced risk", "Name familiarity"],
+      "whyWin": "Slightly safer if you want the higher seed.",
+      "heartFact": "A familiar name to many casual fans.",
+      "funFact": "7-vs-10 is one of the hardest lines to feel “sure” about.",
+      "heartScore": 6
+    },
+    "teamB": {
+      "name": "Missouri",
+      "seed": 10,
+      "record": "",
+      "star": "",
+      "stats": ["Upset-ready", "Close matchup", "Live dog"],
+      "whyWin": "A very realistic upset choice.",
+      "heartFact": "Great pick if you want to be a little bold without going wild.",
+      "funFact": "10 seeds are classic “smart upset” choices.",
+      "heartScore": 7
     }
   }
 ]
