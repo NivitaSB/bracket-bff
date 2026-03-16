@@ -37,24 +37,33 @@
             <h2 class="text-2xl font-bold tracking-tight">Pick by vibe</h2>
             <p class="mt-1 text-sm text-slate-600">Perfect for people who do not want to overthink stats.</p>
           </div>
-          <p class="text-sm text-slate-500">
-            Use these buttons under each matchup to choose your pick.
+          <p class="max-w-md text-sm text-slate-500">
+            Use these buttons under each matchup to choose your pick — or start with all Safe, all Heart, or all Chaos picks below and adjust as you go.
           </p>
         </div>
 
         <div class="mt-5 grid gap-3 sm:grid-cols-3">
-          <div class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
-            <div class="text-sm font-semibold">Safe Pick</div>
+          <button
+            onclick="applyModeToAll('Safe Pick')"
+            class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+          >
+            <div class="text-sm font-semibold">Apply Safe to All</div>
             <div class="mt-1 text-xs text-slate-300">Usually the stronger seed and steadier résumé.</div>
-          </div>
-          <div class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
-            <div class="text-sm font-semibold">Heart Pick</div>
+          </button>
+          <button
+            onclick="applyModeToAll('Heart Pick')"
+            class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+          >
+            <div class="text-sm font-semibold">Apply Heart to All</div>
             <div class="mt-1 text-xs text-slate-300">Choose the story, mascot, school vibe, or fan favorite.</div>
-          </div>
-          <div class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm">
-            <div class="text-sm font-semibold">Chaos Pick</div>
+          </button>
+          <button
+            onclick="applyModeToAll('Chaos Pick')"
+            class="rounded-2xl bg-slate-900 px-4 py-4 text-left text-white shadow-sm transition hover:translate-y-[-1px]"
+          >
+            <div class="text-sm font-semibold">Apply Chaos to All</div>
             <div class="mt-1 text-xs text-slate-300">Choose upset energy and let the bracket get weird.</div>
-          </div>
+          </button>
         </div>
 
         <div class="mt-6 grid gap-3 md:grid-cols-4">
@@ -77,7 +86,7 @@
         </div>
       </div>
 
-      <div id="matchups" class="mt-8 space-y-8"></div>
+      <div id="matchups" class="mt-8 space-y-10"></div>
 
       <div class="mt-8 rounded-[28px] bg-slate-900 p-6 text-white shadow-sm">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -109,10 +118,15 @@
         <div id="personalityBox" class="mt-4"></div>
         <div id="picksSummary" class="mt-4 grid gap-3 md:grid-cols-2"></div>
       </div>
+
+      <footer class="mt-8 rounded-[28px] bg-white p-6 text-sm text-slate-600 shadow-sm ring-1 ring-slate-200">
+        Bracket BFF was created by A &amp; N Bulkan with AI-assistance. Team stories and fun facts are based on public sources and may be simplified for fun. Use this as a lighthearted bracket companion, not official sports advice. If it helps you, share it.
+      </footer>
     </div>
 
     <script>
       let matchups = [];
+      const regionOrder = ["East", "West", "South", "Midwest"];
 
       async function loadMatchups() {
         const response = await fetch("matchups.json");
@@ -136,6 +150,24 @@
       function selectPick(matchupId, teamName, mode) {
         const picks = getStoredPicks();
         picks[matchupId] = { teamName, mode };
+        savePicks(picks);
+        renderMatchups();
+        renderSummary();
+      }
+
+      function applyModeToAll(mode) {
+        const picks = getStoredPicks();
+
+        matchups.forEach((matchup) => {
+          let team;
+
+          if (mode === "Safe Pick") team = chooseSafe(matchup);
+          if (mode === "Heart Pick") team = chooseHeart(matchup);
+          if (mode === "Chaos Pick") team = chooseChaos(matchup);
+
+          picks[matchup.id] = { teamName: team.name, mode: mode };
+        });
+
         savePicks(picks);
         renderMatchups();
         renderSummary();
@@ -176,7 +208,7 @@
         if (chaos >= safe && chaos >= heart) {
           return {
             title: "Chaos Bracket Builder 🔥",
-            blurb: "You live for upsets, chaos, and bracket drama."
+            blurb: "You live for upsets, chaos, and busted brackets."
           };
         }
 
@@ -238,20 +270,26 @@ ${window.location.href}`;
 
         let summary = "My Bracket BFF picks so far:\n\n";
 
-        matchups.forEach((matchup) => {
-          const pick = picks[matchup.id];
-          if (pick) {
-            summary += `${matchup.teamA.name} vs ${matchup.teamB.name} → ${pick.teamName}\n`;
+        regionOrder.forEach((region) => {
+          const regionGames = matchups.filter((m) => m.region === region);
+          const pickedRegionGames = regionGames.filter((m) => picks[m.id]);
+
+          if (pickedRegionGames.length > 0) {
+            summary += `${region} Region\n`;
+            pickedRegionGames.forEach((matchup) => {
+              summary += `${matchup.teamA.name} vs ${matchup.teamB.name} → ${picks[matchup.id].teamName}\n`;
+            });
+            summary += `\n`;
           }
         });
 
         const personality = calculatePersonality();
 
         if (personality) {
-          summary += `\nBracket Personality:\n${personality.title}`;
+          summary += `Bracket Personality:\n${personality.title}\n\n`;
         }
 
-        summary += `\n\nTry it here:\n${window.location.href}`;
+        summary += `Try it here:\n${window.location.href}`;
 
         shareText(summary);
       }
@@ -386,7 +424,7 @@ ${window.location.href}`;
 
               <div class="flex flex-col items-center justify-center gap-3 py-2 lg:pt-16">
                 <div class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">${matchup.round}</div>
-                <div class="text-sm font-medium text-slate-500">matchup</div>
+                <div class="text-sm font-medium text-slate-500">${matchup.region} Region</div>
                 <div class="rounded-full bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-700">
                   ${matchup.teamA.name} vs ${matchup.teamB.name}
                 </div>
@@ -406,12 +444,30 @@ ${window.location.href}`;
       }
 
       function renderMatchups() {
-        document.getElementById("matchups").innerHTML = matchups.map(matchupBlock).join("");
+        const grouped = regionOrder.map((region) => {
+          const regionGames = matchups.filter((m) => m.region === region);
+
+          return `
+            <section class="space-y-4">
+              <div class="flex items-center gap-3">
+                <h2 class="text-3xl font-black tracking-tight text-slate-900">${region} Region</h2>
+                <span class="rounded-full bg-pink-100 px-3 py-1 text-xs font-semibold text-pink-700">
+                  Round of 64
+                </span>
+              </div>
+              <div class="space-y-6">
+                ${regionGames.map(matchupBlock).join("")}
+              </div>
+            </section>
+          `;
+        }).join("");
+
+        document.getElementById("matchups").innerHTML = grouped;
       }
 
       function renderSummary() {
         const picks = getStoredPicks();
-        const pickedGames = matchups.filter(m => picks[m.id]);
+        const pickedGames = matchups.filter((m) => picks[m.id]);
         const personality = calculatePersonality();
 
         document.getElementById("personalityBox").innerHTML = personality
@@ -434,16 +490,30 @@ ${window.location.href}`;
           return;
         }
 
-        document.getElementById("picksSummary").innerHTML = pickedGames.map(matchup => {
-          const pick = picks[matchup.id];
+        const groupedSummary = regionOrder.map((region) => {
+          const regionGames = pickedGames.filter((m) => m.region === region);
+          if (regionGames.length === 0) return "";
+
           return `
             <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-              <p class="font-semibold">${matchup.teamA.name} vs ${matchup.teamB.name}</p>
-              <p class="mt-1 text-sm text-slate-200">Picked: ${pick.teamName}</p>
-              <p class="mt-1 text-xs text-slate-300">${pick.mode}</p>
+              <p class="font-semibold text-pink-200">${region} Region</p>
+              <div class="mt-3 space-y-3">
+                ${regionGames.map((matchup) => {
+                  const pick = picks[matchup.id];
+                  return `
+                    <div>
+                      <p class="font-semibold">${matchup.teamA.name} vs ${matchup.teamB.name}</p>
+                      <p class="mt-1 text-sm text-slate-200">Picked: ${pick.teamName}</p>
+                      <p class="mt-1 text-xs text-slate-300">${pick.mode}</p>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
             </div>
           `;
         }).join("");
+
+        document.getElementById("picksSummary").innerHTML = groupedSummary;
       }
 
       loadMatchups();
