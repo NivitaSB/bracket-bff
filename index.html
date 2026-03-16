@@ -495,43 +495,45 @@ ${window.location.href}`;
         return `
           <button
             ${clickable ? `onclick="manualPick('${matchupId}', '${team.name.replace(/'/g, "\\'")}')"` : "disabled"}
-            class="w-full rounded-3xl p-5 text-left shadow-sm transition ${selectedStyles(isSelected, team.placeholder)} ${clickable ? "hover:translate-y-[-1px] cursor-pointer" : "cursor-not-allowed"}"
+            class="w-full rounded-3xl p-3 sm:p-5 text-left shadow-sm transition ${selectedStyles(isSelected, team.placeholder)} ${clickable ? "hover:translate-y-[-1px] cursor-pointer" : "cursor-not-allowed"}"
           >
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <p class="text-sm font-medium text-pink-600">${label}</p>
-                <h3 class="mt-1 text-2xl font-bold text-slate-900">${team.name}</h3>
-                <p class="text-sm text-slate-600">Record: ${team.record || "TBD"}</p>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div class="min-w-0">
+                <p class="text-xs sm:text-sm font-medium text-pink-600">${label}</p>
+                <h3 class="mt-1 text-base sm:text-2xl font-bold text-slate-900 break-words">${team.name}</h3>
+                <p class="text-xs sm:text-sm text-slate-600">Record: ${team.record || "TBD"}</p>
               </div>
-              ${seedBadge(team.seed)}
+              <div class="shrink-0">
+                ${seedBadge(team.seed)}
+              </div>
             </div>
 
             ${selectedLabel(isSelected, mode)}
 
-            <div class="mt-4 rounded-2xl bg-slate-50 p-4">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Star player</p>
-              <p class="mt-1 text-base font-semibold text-slate-900">${team.star || "TBD"}</p>
+            <div class="mt-3 sm:mt-4 rounded-2xl bg-slate-50 p-3 sm:p-4">
+              <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-slate-500">Star player</p>
+              <p class="mt-1 text-sm sm:text-base font-semibold text-slate-900 break-words">${team.star || "TBD"}</p>
             </div>
 
-            <div class="mt-4">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick read</p>
-              <ul class="mt-2 space-y-2 text-sm text-slate-700">
+            <div class="mt-3 sm:mt-4">
+              <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-slate-500">Quick read</p>
+              <ul class="mt-2 space-y-2 text-xs sm:text-sm text-slate-700">
                 ${statList(team.stats)}
               </ul>
             </div>
 
-            <div class="mt-4 grid gap-3">
-              <div class="rounded-2xl bg-blue-50 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Why they could win</p>
-                <p class="mt-1 text-sm text-slate-800">${team.whyWin || "TBD"}</p>
+            <div class="mt-3 sm:mt-4 grid gap-3">
+              <div class="rounded-2xl bg-blue-50 p-3 sm:p-4">
+                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-blue-700">Why they could win</p>
+                <p class="mt-1 text-xs sm:text-sm text-slate-800">${team.whyWin || "TBD"}</p>
               </div>
-              <div class="rounded-2xl bg-rose-50 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-rose-700">Heart fact</p>
-                <p class="mt-1 text-sm text-slate-800">${team.heartFact || "TBD"}</p>
+              <div class="rounded-2xl bg-rose-50 p-3 sm:p-4">
+                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-rose-700">Heart fact</p>
+                <p class="mt-1 text-xs sm:text-sm text-slate-800">${team.heartFact || "TBD"}</p>
               </div>
-              <div class="rounded-2xl bg-violet-50 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-violet-700">Fun fact</p>
-                <p class="mt-1 text-sm text-slate-800">${team.funFact || "TBD"}</p>
+              <div class="rounded-2xl bg-violet-50 p-3 sm:p-4">
+                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-violet-700">Fun fact</p>
+                <p class="mt-1 text-xs sm:text-sm text-slate-800">${team.funFact || "TBD"}</p>
               </div>
             </div>
           </button>
@@ -584,8 +586,17 @@ ${window.location.href}`;
         const selectedMode = selected?.mode || "";
 
         return `
-          <div class="rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <div class="grid gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-start">
+          <div class="rounded-[28px] bg-white p-4 sm:p-6 shadow-sm ring-1 ring-slate-200">
+            <div class="mb-4 flex flex-col items-center justify-center gap-2 text-center lg:hidden">
+              <div class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">${matchup.round}</div>
+              <div class="text-sm font-medium text-slate-500">${matchup.region}</div>
+              <div class="rounded-full bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-700">
+                ${matchup.teamA.name} vs ${matchup.teamB.name}
+              </div>
+              <div class="text-xs text-slate-500">Tip: tap a team card to make a manual pick.</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 lg:grid-cols-[1fr_auto_1fr] lg:gap-6 lg:items-start">
               ${teamCard(
                 matchup.teamA,
                 "Safer side?",
@@ -594,7 +605,7 @@ ${window.location.href}`;
                 matchup.id
               )}
 
-              <div class="flex flex-col items-center justify-center gap-3 py-2 lg:pt-16">
+              <div class="hidden lg:flex flex-col items-center justify-center gap-3 py-2 lg:pt-16">
                 <div class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">${matchup.round}</div>
                 <div class="text-sm font-medium text-slate-500">${matchup.region}</div>
                 <div class="rounded-full bg-pink-100 px-4 py-2 text-sm font-semibold text-pink-700">
