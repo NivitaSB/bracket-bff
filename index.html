@@ -80,41 +80,34 @@
       <div id="matchups" class="mt-8 space-y-8"></div>
 
       <div class="mt-8 rounded-[28px] bg-slate-900 p-6 text-white shadow-sm">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 class="text-2xl font-bold">Your picks so far</h2>
             <p class="mt-1 text-sm text-slate-300">Selections are saved in this browser.</p>
           </div>
-          <button
-            onclick="resetPicks()"
-            class="rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/20"
-          >
-            Reset picks
-          </button>
+          <div class="flex flex-wrap gap-3">
+            <button
+              onclick="sharePersonality()"
+              class="rounded-2xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white shadow-sm"
+            >
+              Share Personality
+            </button>
+            <button
+              onclick="sharePicks()"
+              class="rounded-2xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white shadow-sm"
+            >
+              Share Picks
+            </button>
+            <button
+              onclick="resetPicks()"
+              class="rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/20"
+            >
+              Reset Picks
+            </button>
+          </div>
         </div>
+        <div id="personalityBox" class="mt-4"></div>
         <div id="picksSummary" class="mt-4 grid gap-3 md:grid-cols-2"></div>
-      </div>
-
-      <div class="mt-8 rounded-[28px] bg-slate-900 p-6 text-white shadow-sm">
-        <h2 class="text-2xl font-bold">How the real version will work</h2>
-        <div class="mt-4 grid gap-3 md:grid-cols-4">
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-            <p class="font-semibold">1. Tournament feed</p>
-            <p class="mt-1 text-sm text-slate-200">SportsDataIO loads the real March bracket and seeds.</p>
-          </div>
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-            <p class="font-semibold">2. Team cards</p>
-            <p class="mt-1 text-sm text-slate-200">Stats and player leaders are generated for each team.</p>
-          </div>
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-            <p class="font-semibold">3. Story layer</p>
-            <p class="mt-1 text-sm text-slate-200">Wikipedia or official team pages add fun facts and heart facts.</p>
-          </div>
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-            <p class="font-semibold">4. Shareable link</p>
-            <p class="mt-1 text-sm text-slate-200">Publish on Vercel so friends can use it on their phones.</p>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -166,6 +159,103 @@
         return matchup.teamA.seed > matchup.teamB.seed ? matchup.teamA : matchup.teamB;
       }
 
+      function calculatePersonality() {
+        const picks = getStoredPicks();
+        let safe = 0;
+        let heart = 0;
+        let chaos = 0;
+
+        Object.values(picks).forEach((pick) => {
+          if (pick.mode === "Safe Pick") safe++;
+          if (pick.mode === "Heart Pick") heart++;
+          if (pick.mode === "Chaos Pick") chaos++;
+        });
+
+        if (safe === 0 && heart === 0 && chaos === 0) return null;
+
+        if (chaos >= safe && chaos >= heart) {
+          return {
+            title: "Chaos Bracket Builder 🔥",
+            blurb: "You live for upsets, chaos, and bracket drama."
+          };
+        }
+
+        if (heart >= safe && heart >= chaos) {
+          return {
+            title: "Fairy-Tale Follower 🧚",
+            blurb: "Underdog energy. You believe in Cinderella runs."
+          };
+        }
+
+        return {
+          title: "Bracket Realist 📊",
+          blurb: "You trust the numbers and pick the strongest path."
+        };
+      }
+
+      function shareText(text) {
+        if (navigator.share) {
+          navigator.share({
+            title: "Bracket BFF",
+            text: text,
+            url: window.location.href
+          }).catch(() => {});
+        } else if (navigator.clipboard) {
+          navigator.clipboard.writeText(text);
+          alert("Share text copied! Paste it into a text or group chat.");
+        } else {
+          alert(text);
+        }
+      }
+
+      function sharePersonality() {
+        const personality = calculatePersonality();
+
+        if (!personality) {
+          alert("Make a few picks first!");
+          return;
+        }
+
+        const text = `My March Madness bracket personality is:
+
+${personality.title}
+
+${personality.blurb}
+
+Try Bracket BFF:
+${window.location.href}`;
+
+        shareText(text);
+      }
+
+      function sharePicks() {
+        const picks = getStoredPicks();
+
+        if (Object.keys(picks).length === 0) {
+          alert("Make a few picks first!");
+          return;
+        }
+
+        let summary = "My Bracket BFF picks so far:\n\n";
+
+        matchups.forEach((matchup) => {
+          const pick = picks[matchup.id];
+          if (pick) {
+            summary += `${matchup.teamA.name} vs ${matchup.teamB.name} → ${pick.teamName}\n`;
+          }
+        });
+
+        const personality = calculatePersonality();
+
+        if (personality) {
+          summary += `\nBracket Personality:\n${personality.title}`;
+        }
+
+        summary += `\n\nTry it here:\n${window.location.href}`;
+
+        shareText(summary);
+      }
+
       function seedBadge(seed) {
         let bg = "bg-slate-100 text-slate-800";
         let note = "mid seed";
@@ -184,7 +274,7 @@
       }
 
       function statList(stats) {
-        return stats.map(stat => `
+        return (stats || []).map(stat => `
           <li class="rounded-xl bg-slate-50 px-3 py-2">${stat}</li>
         `).join("");
       }
@@ -211,7 +301,7 @@
               <div>
                 <p class="text-sm font-medium text-pink-600">${label}</p>
                 <h3 class="mt-1 text-2xl font-bold text-slate-900">${team.name}</h3>
-                <p class="text-sm text-slate-600">Record: ${team.record}</p>
+                <p class="text-sm text-slate-600">Record: ${team.record || "TBD"}</p>
               </div>
               ${seedBadge(team.seed)}
             </div>
@@ -220,7 +310,7 @@
 
             <div class="mt-4 rounded-2xl bg-slate-50 p-4">
               <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Star player</p>
-              <p class="mt-1 text-base font-semibold text-slate-900">${team.star}</p>
+              <p class="mt-1 text-base font-semibold text-slate-900">${team.star || "TBD"}</p>
             </div>
 
             <div class="mt-4">
@@ -233,15 +323,15 @@
             <div class="mt-4 grid gap-3">
               <div class="rounded-2xl bg-blue-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Why they could win</p>
-                <p class="mt-1 text-sm text-slate-800">${team.whyWin}</p>
+                <p class="mt-1 text-sm text-slate-800">${team.whyWin || "TBD"}</p>
               </div>
               <div class="rounded-2xl bg-rose-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-rose-700">Heart fact</p>
-                <p class="mt-1 text-sm text-slate-800">${team.heartFact}</p>
+                <p class="mt-1 text-sm text-slate-800">${team.heartFact || "TBD"}</p>
               </div>
               <div class="rounded-2xl bg-violet-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-violet-700">Fun fact</p>
-                <p class="mt-1 text-sm text-slate-800">${team.funFact}</p>
+                <p class="mt-1 text-sm text-slate-800">${team.funFact || "TBD"}</p>
               </div>
             </div>
           </div>
@@ -322,6 +412,17 @@
       function renderSummary() {
         const picks = getStoredPicks();
         const pickedGames = matchups.filter(m => picks[m.id]);
+        const personality = calculatePersonality();
+
+        document.getElementById("personalityBox").innerHTML = personality
+          ? `
+            <div class="rounded-2xl bg-pink-100 p-4 text-pink-900">
+              <p class="text-sm font-semibold uppercase tracking-wide">Your Bracket Personality</p>
+              <p class="mt-1 text-xl font-bold">${personality.title}</p>
+              <p class="mt-1 text-sm">${personality.blurb}</p>
+            </div>
+          `
+          : "";
 
         if (pickedGames.length === 0) {
           document.getElementById("picksSummary").innerHTML = `
