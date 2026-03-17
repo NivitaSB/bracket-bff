@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bracket BFF</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
   </head>
   <body class="min-h-screen bg-gradient-to-b from-pink-50 via-white to-slate-50 text-slate-900">
     <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -31,6 +30,8 @@
           </div>
         </div>
       </div>
+
+      <div id="shareCardHeader" class="mt-6"></div>
 
       <div class="mt-6 rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-slate-200">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -92,15 +93,15 @@
       <div class="mt-8 rounded-[28px] bg-slate-900 p-6 text-white shadow-sm">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 class="text-2xl font-bold">Your picks so far</h2>
-            <p class="mt-1 text-sm text-slate-300">Selections are saved in this browser.</p>
+            <h2 class="text-2xl font-bold">Your bracket snapshot</h2>
+            <p class="mt-1 text-sm text-slate-300">A shorter, cleaner summary for sharing.</p>
           </div>
           <div class="flex flex-wrap gap-3">
             <button
-              onclick="sharePersonality()"
+              onclick="shareCardText()"
               class="rounded-2xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white shadow-sm"
             >
-              Share Personality
+              Share Card Text
             </button>
             <button
               onclick="sharePicks()"
@@ -116,8 +117,7 @@
             </button>
           </div>
         </div>
-        <div id="personalityBox" class="mt-4"></div>
-        <div id="picksSummary" class="mt-4 grid gap-3 md:grid-cols-2"></div>
+        <div id="shortSummary" class="mt-4"></div>
       </div>
 
       <footer class="mt-8 rounded-[28px] bg-white p-6 text-sm text-slate-600 shadow-sm ring-1 ring-slate-200">
@@ -136,6 +136,7 @@
       }
 
       function renderAll() {
+        renderShareCardHeader();
         renderBracket();
         renderSummary();
       }
@@ -332,7 +333,7 @@
         renderAll();
       }
 
-      function calculatePersonality() {
+      function calculateModeCounts() {
         const picks = getStoredPicks();
         let safe = 0;
         let heart = 0;
@@ -345,6 +346,12 @@
           if (pick.mode === "Chaos Pick") chaos++;
           if (pick.mode === "Manual Pick") manual++;
         });
+
+        return { safe, heart, chaos, manual };
+      }
+
+      function calculatePersonality() {
+        const { safe, heart, chaos, manual } = calculateModeCounts();
 
         if (safe === 0 && heart === 0 && chaos === 0 && manual === 0) return null;
 
@@ -375,6 +382,89 @@
         };
       }
 
+      function getBracketSnapshot() {
+        const picks = getStoredPicks();
+        const bracket = buildBracket();
+
+        const finalFourWinners = bracket.finalFour.map((m) => picks[m.id]?.teamName).filter(Boolean);
+        const finalists = bracket.championship.length
+          ? [bracket.championship[0].teamA.name, bracket.championship[0].teamB.name]
+          : [];
+        const champion = picks["championship"]?.teamName || null;
+
+        return {
+          finalFour: finalFourWinners,
+          finalists,
+          champion,
+          personality: calculatePersonality(),
+          counts: calculateModeCounts()
+        };
+      }
+
+      function renderShareCardHeader() {
+        const snapshot = getBracketSnapshot();
+
+        if (!snapshot.champion && snapshot.finalFour.length === 0) {
+          document.getElementById("shareCardHeader").innerHTML = "";
+          return;
+        }
+
+        document.getElementById("shareCardHeader").innerHTML = `
+          <div class="rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.2em] text-pink-600">Your Bracket Card</p>
+                <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-900">Quick bracket snapshot</h2>
+                <p class="mt-2 text-sm text-slate-600">A cleaner visual summary of your bracket as it takes shape.</p>
+              </div>
+              <div class="rounded-2xl bg-pink-50 px-4 py-3 text-sm text-pink-700 ring-1 ring-pink-100">
+                ${snapshot.personality ? `<span class="font-semibold">${snapshot.personality.title}</span>` : "Start picking to build your bracket card."}
+              </div>
+            </div>
+
+            <div class="mt-6 grid gap-4 md:grid-cols-4">
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Champion</p>
+                <p class="mt-2 text-xl font-bold text-slate-900">${snapshot.champion || "TBD"}</p>
+              </div>
+
+              <div class="rounded-2xl bg-slate-50 p-4 md:col-span-2">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Final Four</p>
+                <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                  ${[0,1,2,3].map((i) => `
+                    <div class="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-800 ring-1 ring-slate-200">
+                      ${snapshot.finalFour[i] || "TBD"}
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Mode Mix</p>
+                <div class="mt-2 space-y-2 text-sm text-slate-700">
+                  <div>Safe: <span class="font-semibold">${snapshot.counts.safe}</span></div>
+                  <div>Heart: <span class="font-semibold">${snapshot.counts.heart}</span></div>
+                  <div>Chaos: <span class="font-semibold">${snapshot.counts.chaos}</span></div>
+                  <div>Manual: <span class="font-semibold">${snapshot.counts.manual}</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
+              <div class="rounded-2xl bg-blue-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Finalist 1</p>
+                <p class="mt-2 text-lg font-bold text-slate-900">${snapshot.finalists[0] || "TBD"}</p>
+              </div>
+              <div class="rounded-full bg-slate-900 px-4 py-2 text-center text-sm font-semibold text-white">vs</div>
+              <div class="rounded-2xl bg-blue-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Finalist 2</p>
+                <p class="mt-2 text-lg font-bold text-slate-900">${snapshot.finalists[1] || "TBD"}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
       function shareText(text) {
         if (navigator.share) {
           navigator.share({
@@ -390,63 +480,48 @@
         }
       }
 
-      function sharePersonality() {
-        const personality = calculatePersonality();
+      function shareCardText() {
+        const snapshot = getBracketSnapshot();
 
-        if (!personality) {
+        if (!snapshot.champion && snapshot.finalFour.length === 0) {
           alert("Make a few picks first!");
           return;
         }
 
-        const text = `My March Madness bracket personality is:
+        const finalFourText = snapshot.finalFour.length
+          ? snapshot.finalFour.join(", ")
+          : "Still building";
 
-${personality.title}
+        const text = `Bracket BFF
 
-${personality.blurb}
+Champion: ${snapshot.champion || "Still building"}
+Final Four: ${finalFourText}
+Personality: ${snapshot.personality ? snapshot.personality.title : "Still building"}
 
-Try Bracket BFF:
-${window.location.href}`;
+Build yours at ${window.location.href}`;
 
         shareText(text);
       }
 
       function sharePicks() {
-        const picks = getStoredPicks();
+        const snapshot = getBracketSnapshot();
 
-        if (Object.keys(picks).length === 0) {
+        if (!snapshot.champion && snapshot.finalFour.length === 0) {
           alert("Make a few picks first!");
           return;
         }
 
-        const bracket = buildBracket();
-        let summary = "My Bracket BFF picks so far:\n\n";
+        const text = `My Bracket BFF bracket so far:
 
-        const sections = [
-          ["Round of 64", firstRoundMatchups],
-          ["Round of 32", Object.values(bracket.round32ByRegion).flat()],
-          ["Sweet 16", Object.values(bracket.sweet16ByRegion).flat()],
-          ["Elite 8", Object.values(bracket.elite8ByRegion).flat()],
-          ["Final Four", bracket.finalFour],
-          ["Championship", bracket.championship]
-        ];
+Champion: ${snapshot.champion || "Still building"}
+Finalists: ${(snapshot.finalists[0] || "TBD")} vs ${(snapshot.finalists[1] || "TBD")}
+Final Four: ${snapshot.finalFour.length ? snapshot.finalFour.join(", ") : "Still building"}
+Personality: ${snapshot.personality ? snapshot.personality.title : "Still building"}
 
-        sections.forEach(([label, games]) => {
-          const pickedGames = games.filter((m) => picks[m.id]);
-          if (pickedGames.length > 0) {
-            summary += `${label}\n`;
-            pickedGames.forEach((matchup) => {
-              summary += `${matchup.teamA.name} vs ${matchup.teamB.name} → ${picks[matchup.id].teamName}\n`;
-            });
-            summary += `\n`;
-          }
-        });
+Try it here:
+${window.location.href}`;
 
-        const personality = calculatePersonality();
-        if (personality) {
-          summary += `Bracket Personality:\n${personality.title}\n\n`;
-        }
-
-        shareText(summary + `Try it here:\n${window.location.href}`);
+        shareText(text);
       }
 
       function seedBadge(seed) {
@@ -695,52 +770,33 @@ ${window.location.href}`;
       }
 
       function renderSummary() {
-        const picks = getStoredPicks();
-        const bracket = buildBracket();
-        const sections = [
-          ["Round of 64", firstRoundMatchups],
-          ["Round of 32", Object.values(bracket.round32ByRegion).flat()],
-          ["Sweet 16", Object.values(bracket.sweet16ByRegion).flat()],
-          ["Elite 8", Object.values(bracket.elite8ByRegion).flat()],
-          ["Final Four", bracket.finalFour],
-          ["Championship", bracket.championship]
-        ];
-        const personality = calculatePersonality();
+        const snapshot = getBracketSnapshot();
 
-        document.getElementById("personalityBox").innerHTML = personality
-          ? `
-            <div class="rounded-2xl bg-pink-100 p-4 text-pink-900">
-              <p class="text-sm font-semibold uppercase tracking-wide">Your Bracket Personality</p>
-              <p class="mt-1 text-xl font-bold">${personality.title}</p>
-              <p class="mt-1 text-sm">${personality.blurb}</p>
-            </div>
-          `
-          : "";
-
-        const pickedHtml = sections.map(([title, games]) => {
-          const pickedGames = games.filter((m) => picks[m.id]);
-          if (pickedGames.length === 0) return "";
-
-          return `
+        if (!snapshot.champion && snapshot.finalFour.length === 0) {
+          document.getElementById("shortSummary").innerHTML = `
             <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-              <p class="font-semibold text-pink-200">${title}</p>
-              <div class="mt-3 space-y-3">
-                ${pickedGames.map((matchup) => `
-                  <div>
-                    <p class="font-semibold">${matchup.teamA.name} vs ${matchup.teamB.name}</p>
-                    <p class="mt-1 text-sm text-slate-200">Picked: ${picks[matchup.id].teamName}</p>
-                    <p class="mt-1 text-xs text-slate-300">${picks[matchup.id].mode}</p>
-                  </div>
-                `).join("")}
-              </div>
+              <p class="font-semibold">No picks yet</p>
+              <p class="mt-1 text-sm text-slate-300">Start picking to build your bracket card and summary.</p>
             </div>
           `;
-        }).join("");
+          return;
+        }
 
-        document.getElementById("picksSummary").innerHTML = pickedHtml || `
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-            <p class="font-semibold">No picks yet</p>
-            <p class="mt-1 text-sm text-slate-300">Use the buttons under each matchup to start building your bracket.</p>
+        document.getElementById("shortSummary").innerHTML = `
+          <div class="grid gap-3 md:grid-cols-3">
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+              <p class="text-sm font-semibold text-pink-200">Champion</p>
+              <p class="mt-2 text-xl font-bold">${snapshot.champion || "TBD"}</p>
+            </div>
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10 md:col-span-2">
+              <p class="text-sm font-semibold text-pink-200">Final Four</p>
+              <p class="mt-2 text-sm text-slate-100">${snapshot.finalFour.length ? snapshot.finalFour.join(" • ") : "Still building"}</p>
+            </div>
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10 md:col-span-3">
+              <p class="text-sm font-semibold text-pink-200">Bracket Personality</p>
+              <p class="mt-2 text-lg font-bold">${snapshot.personality ? snapshot.personality.title : "Still building"}</p>
+              <p class="mt-1 text-sm text-slate-300">${snapshot.personality ? snapshot.personality.blurb : ""}</p>
+            </div>
           </div>
         `;
       }
