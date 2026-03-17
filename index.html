@@ -384,13 +384,22 @@
 
       function getBracketSnapshot() {
         const picks = getStoredPicks();
-        const bracket = buildBracket();
 
-        const finalFourParticipants = bracket.finalFour.flatMap((m) => [m.teamA.name, m.teamB.name]);
+        const finalFourMatchupIds = [
+          "east-e8-1",
+          "west-e8-1",
+          "south-e8-1",
+          "midwest-e8-1"
+        ];
 
-        const finalists = bracket.championship.length
-          ? [bracket.championship[0].teamA.name, bracket.championship[0].teamB.name]
-          : [];
+        const finalFourParticipants = finalFourMatchupIds
+          .map((id) => picks[id]?.teamName)
+          .filter(Boolean);
+
+        const finalists = [
+          picks["final4-1"]?.teamName,
+          picks["final4-2"]?.teamName
+        ].filter(Boolean);
 
         const champion = picks["championship"]?.teamName || null;
 
@@ -406,7 +415,11 @@
       function renderShareCardHeader() {
         const snapshot = getBracketSnapshot();
 
-        if (!snapshot.champion && snapshot.finalFour.length === 0) {
+        if (
+          !snapshot.champion &&
+          snapshot.finalFour.length === 0 &&
+          snapshot.finalists.length === 0
+        ) {
           document.getElementById("shareCardHeader").innerHTML = "";
           return;
         }
@@ -485,7 +498,11 @@
       function shareCardText() {
         const snapshot = getBracketSnapshot();
 
-        if (!snapshot.champion && snapshot.finalFour.length === 0) {
+        if (
+          !snapshot.champion &&
+          snapshot.finalFour.length === 0 &&
+          snapshot.finalists.length === 0
+        ) {
           alert("Make a few picks first!");
           return;
         }
@@ -508,7 +525,11 @@ Build yours at ${window.location.href}`;
       function sharePicks() {
         const snapshot = getBracketSnapshot();
 
-        if (!snapshot.champion && snapshot.finalFour.length === 0) {
+        if (
+          !snapshot.champion &&
+          snapshot.finalFour.length === 0 &&
+          snapshot.finalists.length === 0
+        ) {
           alert("Make a few picks first!");
           return;
         }
@@ -774,7 +795,11 @@ ${window.location.href}`;
       function renderSummary() {
         const snapshot = getBracketSnapshot();
 
-        if (!snapshot.champion && snapshot.finalFour.length === 0) {
+        if (
+          !snapshot.champion &&
+          snapshot.finalFour.length === 0 &&
+          snapshot.finalists.length === 0
+        ) {
           document.getElementById("shortSummary").innerHTML = `
             <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
               <p class="font-semibold">No picks yet</p>
