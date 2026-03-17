@@ -386,14 +386,16 @@
         const picks = getStoredPicks();
         const bracket = buildBracket();
 
-        const finalFourWinners = bracket.finalFour.map((m) => picks[m.id]?.teamName).filter(Boolean);
+        const finalFourParticipants = bracket.finalFour.flatMap((m) => [m.teamA.name, m.teamB.name]);
+
         const finalists = bracket.championship.length
           ? [bracket.championship[0].teamA.name, bracket.championship[0].teamB.name]
           : [];
+
         const champion = picks["championship"]?.teamName || null;
 
         return {
-          finalFour: finalFourWinners,
+          finalFour: finalFourParticipants,
           finalists,
           champion,
           personality: calculatePersonality(),
